@@ -25,6 +25,8 @@ using namespace std;
 // Operators: add one feature
 // Evaluation function: K-fold cross validation
 
+// Accuracy = Number of correct classifications / Number of instances in our database
+
 // FUNCTION STUBS
 double normalize(double n);
 double leave_one_out_cross_validation(const vector<vector<double> >& data, const vector<int>& current_set, int feature_to_add);
@@ -83,7 +85,7 @@ void feature_search_demo(const vector<vector<double> >& data) {
 
         for (int k = 1; k <= num_features; ++k) {
             if (find(current_set_of_features.begin(), current_set_of_features.end(), k) == current_set_of_features.end()) { // if feature k is not in current_set_of_features
-                cout << "--Considering adding the " << k << " feature" << endl;
+                cout << "\tConsidering adding the " << k << " feature" << endl;
                 double accuracy = leave_one_out_cross_validation(data, current_set_of_features, k);
 
                 if (accuracy > best_so_far_accuracy) {
@@ -94,7 +96,7 @@ void feature_search_demo(const vector<vector<double> >& data) {
         }
 
         current_set_of_features.push_back(feature_to_add_at_this_level);
-        cout << "On level " << (i + 1) << " I added feature " << feature_to_add_at_this_level << " to current set" << endl;
+        cout << "On level " << (i + 1) << " I added feature " << feature_to_add_at_this_level << " to current set" << endl << endl;
     }
     
     cout << endl << "Final set of selected features: ";
@@ -110,24 +112,17 @@ double leave_one_out_cross_validation(const vector<vector<double> >& data, const
 
 int main() {
     string file_name;
-    string file_choice;
+    double accuracy = 0.0;
     
-    cout << "Which dataset would you like to use: ('small' or 'large') ";
-    cin >> file_choice;
-    if (file_choice == "small") {
-        file_name = "CS170_Small_Data__98.txt";
-    }
-    else if (file_choice == "large") {
-        file_name = "CS170_Large_Data__91.txt";
-    }
-    else {
-        cout << "Invalid choice. Expected 'small' or 'large'." << endl;
-        exit(-1);
-    }
-
+    cout << "Welcome to Alexander Tran's Feature Selection Algorithm." << endl;
+    cout << "Type in the name of the file to test: "; 
+    cin >> file_name;
+    
     vector<vector<double> > dataset = readDataset(file_name);
 
-    cout << endl << "Starting Feature Search Demo..." << endl;
+    cout << "This dataset has " << (dataset[0].size() - 1) << " features (not including the class attribute), with " << dataset.size() << " instances." << endl;
+    cout << "Running nearest neighbor with all " << dataset[0].size() - 1 << " features, using \"leaving-one-out\" evaluation, I get an accuracy of " << accuracy << '%' << endl;
+    cout << endl << "Beginning search." << endl;
     feature_search_demo(dataset);
 
     return 0;
