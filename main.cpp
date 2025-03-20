@@ -75,7 +75,6 @@ void forward_selection(const vector<vector<double> >& data) {
     double global_best_accuracy = 0.0;
 
     for (int i = 0; i < num_features; ++i) {
-        cout << "On the " << (i + 1) << "th level of the search tree" << endl;
         feature_to_add_at_this_level = -1;
         best_so_far_accuracy = 0.0;
 
@@ -84,11 +83,8 @@ void forward_selection(const vector<vector<double> >& data) {
                 vector<int> test_set = current_set_of_features;
                 test_set.push_back(k);
 
-                cout << "\tConsidering adding the " << k << " feature...";
                 double accuracy = compute_accuracy(data, test_set);
-                cout << "\tFeature ";
-                print_vector(test_set);
-                cout << " has accuracy: " << accuracy << endl;
+                cout << "\tUsing feature(s) {" << k << "} accuracy is " << (accuracy * 100) << '%' << endl;
 
                 if (accuracy > best_so_far_accuracy) {
                     best_so_far_accuracy = accuracy;
@@ -99,9 +95,9 @@ void forward_selection(const vector<vector<double> >& data) {
 
         current_set_of_features.push_back(feature_to_add_at_this_level);
 
-        cout << "On level " << (i + 1) << " I added feature " << feature_to_add_at_this_level << " to current set ";
+        cout << "Feature set ";
         print_vector(current_set_of_features);
-        cout << " with accuracy " << best_so_far_accuracy << endl << endl;
+        cout << " was best, accuracy is " << (best_so_far_accuracy * 100) << '%' << endl;
 
         if (best_so_far_accuracy > global_best_accuracy) {
             global_best_accuracy = best_so_far_accuracy;
@@ -109,9 +105,9 @@ void forward_selection(const vector<vector<double> >& data) {
         }
     }
 
-    cout << endl << "Best feature subset: ";
+    cout << endl << "Finished search!! The best feature subset is ";
     print_vector(best_feature_set);
-    cout << " with accuracy: " << global_best_accuracy << endl << endl;
+    cout << ", which has an accuracy of " << (global_best_accuracy * 100) << '%' << endl;
 }
 
 void backward_elimination(const vector<vector<double> >& data) {
@@ -160,12 +156,12 @@ double compute_accuracy(const vector<vector<double> >& data, const vector<int>& 
 }
 
 void print_vector(const vector<int>& vec) {
-    cout << "{ ";
+    cout << '{';
     for (int i = 0; i < vec.size(); ++i) {
         cout << vec[i];
         if (i < vec.size() - 1) cout << ", ";
     }
-    cout << " }";
+    cout << '}';
 }
 
 int main() {
@@ -181,7 +177,7 @@ int main() {
     cout << "This dataset has " << (dataset[0].size() - 1) << " features (not including the class attribute), with " << dataset.size() << " instances." << endl;
     cout << "Type in the name of the search function ('forward_selection' or 'backward_elimination'): ";
     cin >> search_function;
-    cout << endl << "Beginning search." << endl << endl;
+    cout << "Beginning search." << endl;
     
     if (search_function == "forward_selection") {
         forward_selection(dataset);
