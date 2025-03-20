@@ -1,32 +1,11 @@
-# Prerequisites
-*.d
+# Ignore everything by default
+*
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# But allow dataset files (adjust extensions if needed)
+!*.txt
 
-# Precompiled Headers
-*.gch
-*.pch
+# Allow main.cpp
+!main.cpp
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# Allow README.md
+!README.md
