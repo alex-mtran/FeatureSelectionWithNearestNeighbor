@@ -2,7 +2,7 @@
 *
 
 # But allow dataset files (adjust extensions if needed)
-!*.txt
+!CS170_*.txt
 
 # Allow main.cpp
 !main.cpp
