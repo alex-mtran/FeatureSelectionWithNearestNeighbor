@@ -8,28 +8,9 @@
 #include <algorithm>
 #include <limits>
 #include <iomanip>
+#include <map>
 
 using namespace std;
-
-// datasets: small 98, big 91
-
-// Default rate = size(most common class) / size(dataset)
-// Default rate is the accuracy if we use no features
-
-// Forward selection
-// Given a set of n features, there are 2^n feature subsets we can test
-// Greedy algorithm with:
-// Initial state: no features
-// Operators: add one feature
-// Evaluation function: K-fold cross validation
-
-// Backward Elimination
-// Same as forward selection but with:
-// Initial state: all features
-// Operators: remove one feature
-// Evaluation function: K-fold cross validation
-
-// Accuracy = Number of correct classifications / Number of instances in our database
 
 // FUNCTION STUBS
 double compute_accuracy(const vector<vector<double> >& data, const vector<int>& candidate_set);
@@ -149,7 +130,61 @@ void forward_selection(const vector<vector<double> >& data) {
 }
 
 void backward_elimination(const vector<vector<double> >& data) {
-    cout << "TODO" << endl;
+    vector<int> current_set_of_features;
+    vector<int> best_feature_set;
+    int num_features = data[0].size() - 1; // exclude the classification column
+    int feature_to_remove_at_this_level;
+    double best_so_far_accuracy = 0.0;
+    double global_best_accuracy = 0.0;
+
+    for (int i = 1; i <= num_features; ++i) { // initial state of all features
+        current_set_of_features.push_back(i);
+    }
+
+    best_feature_set = current_set_of_features;
+    global_best_accuracy = compute_accuracy(data, current_set_of_features);
+
+    for (int i = 0; i <= num_features - 1; ++i) {
+        feature_to_remove_at_this_level = -1;
+        best_so_far_accuracy = 0.0;
+
+        for (int k : current_set_of_features) {
+            vector<int> test_set = current_set_of_features;
+            test_set.erase(remove(test_set.begin(), test_set.end(), k), test_set.end()); // remove feature k
+
+            double accuracy = compute_accuracy(data, test_set);
+            cout << "\tRemoving feature {" << k << "} accuracy is " << (accuracy * 100) << '%' << endl;
+
+            if (accuracy > best_so_far_accuracy) {
+                best_so_far_accuracy = accuracy;
+                feature_to_remove_at_this_level = k;
+            }
+        }
+
+        current_set_of_features.erase(remove(current_set_of_features.begin(), current_set_of_features.end(), feature_to_remove_at_this_level), current_set_of_features.end());
+
+        double temp_best_accuracy = global_best_accuracy;
+        if (best_so_far_accuracy > global_best_accuracy) {
+            global_best_accuracy = best_so_far_accuracy;
+            best_feature_set = current_set_of_features;
+        }
+
+        if ((temp_best_accuracy == global_best_accuracy) && (i != (num_features - 1))) {
+            cout << endl << "(Warning, Accuracy has decreased! Continuing search in case of local maxima)";
+        }
+
+        if (i != (num_features - 1)) {
+            cout << endl << "Feature set ";
+            print_vector(current_set_of_features);
+            cout << " was best, accuracy is " << (best_so_far_accuracy * 100) << '%' << endl << endl;
+        }
+    }
+
+    cout << endl << "Finished search!! The best feature subset is ";
+    print_vector(best_feature_set);
+    cout << ", which has an accuracy of " << (global_best_accuracy * 100) << '%' << endl;
+
+    save_best_features_dataset(data, best_feature_set, "best_features_dataset.txt");
 }
 
 void leave_one_out_cross_validation(const vector<vector<double> >& data) {
@@ -185,6 +220,21 @@ void leave_one_out_cross_validation(const vector<vector<double> >& data) {
 }
 
 double compute_accuracy(const vector<vector<double> >& data, const vector<int>& candidate_set) {
+    if (candidate_set.empty()) { // use default rate
+        map<int, int> class_counts;
+        for (const auto& row : data) {
+            class_counts[row[0]]++;
+        }
+
+        int most_common_class_count = 0;
+        for (const auto& pair : class_counts) {
+            most_common_class_count = max(most_common_class_count, pair.second);
+        }
+
+        double default_rate = static_cast<double>(most_common_class_count) / data.size();
+        return default_rate;
+    }
+    
     double number_correctly_classified = 0;
     double nearest_neighbor_distance;
     int nearest_neighbor_label;
