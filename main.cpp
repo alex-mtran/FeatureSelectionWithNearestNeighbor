@@ -9,6 +9,7 @@
 #include <limits>
 #include <iomanip>
 #include <map>
+#include <chrono>
 
 using namespace std;
 
@@ -77,6 +78,8 @@ void save_best_features_dataset(const vector<vector<double>>& data, const vector
 }
 
 void forward_selection(const vector<vector<double> >& data) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     vector<int> current_set_of_features;
     vector<int> best_feature_set;
     int num_features = data[0].size() - 1; // exclude the classification column
@@ -121,6 +124,9 @@ void forward_selection(const vector<vector<double> >& data) {
             cout << " was best, accuracy is " << (best_so_far_accuracy * 100) << '%' << endl << endl;
         }
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    cout << endl << "Forward_selection took " << elapsed.count() << " seconds." << endl;
 
     cout << endl << "Finished search!! The best feature subset is ";
     print_vector(best_feature_set);
@@ -130,6 +136,8 @@ void forward_selection(const vector<vector<double> >& data) {
 }
 
 void backward_elimination(const vector<vector<double> >& data) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     vector<int> current_set_of_features;
     vector<int> best_feature_set;
     int num_features = data[0].size() - 1; // exclude the classification column
@@ -168,7 +176,7 @@ void backward_elimination(const vector<vector<double> >& data) {
             global_best_accuracy = best_so_far_accuracy;
             best_feature_set = current_set_of_features;
         }
-
+        
         if ((temp_best_accuracy == global_best_accuracy) && (i != (num_features - 1))) {
             cout << endl << "(Warning, Accuracy has decreased! Continuing search in case of local maxima)";
         }
@@ -179,6 +187,9 @@ void backward_elimination(const vector<vector<double> >& data) {
             cout << " was best, accuracy is " << (best_so_far_accuracy * 100) << '%' << endl << endl;
         }
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    cout << endl << "Backward_elimination took " << elapsed.count() << " seconds." << endl;  
 
     cout << endl << "Finished search!! The best feature subset is ";
     print_vector(best_feature_set);
@@ -188,6 +199,8 @@ void backward_elimination(const vector<vector<double> >& data) {
 }
 
 void leave_one_out_cross_validation(const vector<vector<double> >& data) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     vector<int> current_set_of_features;
     vector<int> best_feature_set;
     int num_features = data[0].size() - 1; // exclude the classification column
@@ -214,8 +227,11 @@ void leave_one_out_cross_validation(const vector<vector<double> >& data) {
 
         current_set_of_features.push_back(feature_to_add_at_this_level);
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    cout << "Leave_one_out_cross_validation took " << elapsed.count() << " seconds." << endl;
 
-    cout << endl << "This dataset has " << num_features << " features (not including the class attribute), with " << data.size() << " instances." << endl << endl << endl;
+    cout << endl << "This dataset has " << num_features << " features (not including the class attribute), with " << data.size() << " instances." << endl;
     cout << "Running nearest neighbor with all " << num_features << " features, using \"leaving-one-out\" evaluation, I get an accuracy of " << (best_so_far_accuracy * 100) << '%' << endl << endl;
 }
 
